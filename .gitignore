@@ -1,0 +1,5 @@
+**vPy**
+**__pycache__**
+**.vscode**
+client/build
+client/dist
