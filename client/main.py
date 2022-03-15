@@ -6,6 +6,7 @@ from app.network import Network
 from app.game import Game
 from app.player import Player
 from app.config import config
+from app.lang import sys_lang
 from moviepy.editor import VideoFileClip
 import PIL
 
@@ -23,26 +24,43 @@ class MainMenu:
         self.name_font = pygame.font.Font('contents/font.ttf', 80)
         self.title_font = pygame.font.Font('contents/font.ttf', 80)
         self.enter_font = pygame.font.Font('contents/font.ttf', 60)
+        self.language = 'English'
+        self.__click = False
 
     def draw(self):
         self.win.blit(self.BG, (0, 0))
-        title = self.title_font.render("How to win lord demon!", 1, (255, 255, 255))
+        title = self.title_font.render(sys_lang.lang(self.language)['1'], 1, (255, 255, 255))
         self.win.blit(title, (self.WIDTH/2 - title.get_width()/2, 20))
 
-        name = self.name_font.render("Type a Name: " + self.name, 1, (255, 255, 255))
+        name = self.name_font.render(sys_lang.lang(self.language)['2'] + ": " + self.name, 1, (255, 255, 255))
         self.win.blit(name, (100, 400))
 
+        # Lang button
+        ButtonText = self.enter_font.render("Language " + self.language, 1, (255, 255, 255))
+        languageButton = pygame.Rect((self.WIDTH/2 + 270, self.HEIGHT/2 + 50), (130, 100))
+        self.win.blit(ButtonText, (self.WIDTH/2, self.HEIGHT/2 + 50))
+
+        pos = pygame.mouse.get_pos()
+
+        if languageButton.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1 and self.__click == False:
+                self.language = "Thai" if self.language == "English" else "English"
+                self.__click = True
+
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.__click = False
+
         if self.waiting:
-            enter = self.enter_font.render("In Queue...", 1, (255, 255, 255))
+            enter = self.enter_font.render(sys_lang.lang(self.language)['3'] + "...", 1, (255, 255, 255))
             self.win.blit(enter, (self.WIDTH - enter.get_width(), 900))
         else:
-            enter = self.enter_font.render("Press enter to join a game...", 1, (255, 255, 255))
+            enter = self.enter_font.render(sys_lang.lang(self.language)['4'] + "...", 1, (255, 255, 255))
             self.win.blit(enter, (self.WIDTH - enter.get_width(), 900))
 
         try:
             if self.n.status() == 0:
                 self.waiting = False
-                enter = self.enter_font.render("Server isn't available...", 1, (255, 255, 255))
+                enter = self.enter_font.render(sys_lang.lang(self.language)['5'] + "...", 1, (255, 255, 255))
                 self.win.blit(enter, (self.WIDTH - enter.get_width(), 800))
         except Exception:
             pass
