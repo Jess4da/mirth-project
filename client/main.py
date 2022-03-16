@@ -82,6 +82,7 @@ class MainMenu:
                 if response:
                     run = False
                     g = Game(self.win, self.n)
+                    g.set_lang(self.language)
                     for player in response:
                         p = Player(player)
                         g.add_player(p)

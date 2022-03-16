@@ -8,43 +8,49 @@ from .bottom_bar import BottomBar
 from .chat import Chat
 from .network import Network
 from .endscene import Endscene
+from .lang import TRANSLATE
+
 
 class Game:
     BG = pygame.image.load('contents/bg.png')
     BG = pygame.transform.scale(BG, (1300, 1000))
     COLORS = {
-        (255,255,255): 0,
-        (0,0,0): 1,
-        (255,0,0): 2,
-        (0,255,0): 3,
-        (0,0,255): 4,
-        (255,255,0): 5,
-        (255,140,0): 6,
-        (165,42,42): 7,
-        (128,0,128): 8
+        (255, 255, 255): 0,
+        (0, 0, 0): 1,
+        (255, 0, 0): 2,
+        (0, 255, 0): 3,
+        (0, 0, 255): 4,
+        (255, 255, 0): 5,
+        (255, 140, 0): 6,
+        (165, 42, 42): 7,
+        (128, 0, 128): 8
     }
 
-    def __init__(self,win, connection=None):
+    def __init__(self, win, connection=None):
         pygame.font.init()
         self.connection = connection
         self.win = win
-        self.leaderboard = Leaderboard(50,125)
-        self.board = Board(305,125)
-        self.top_bar = TopBar(10,10,1280,100)
+        self.leaderboard = Leaderboard(50, 125)
+        self.board = Board(305, 125)
+        self.top_bar = TopBar(10, 10, 1280, 100)
         self.top_bar.change_round(1)
         self.players = []
-        self.skip_button = TextButton(85, 830, 125, 60, (255,255,0), "Skip")
-        self.bottom_bar = BottomBar(305,880,self)
+        self.skip_button = TextButton(85, 830, 125, 60, (255, 255, 0), "Skip")
+        self.bottom_bar = BottomBar(305, 880, self)
         self.chat = Chat(1050, 125)
-        self.draw_color = (0,0,0)
+        self.draw_color = (0, 0, 0)
         self.drawing = False
         self.ending = False
         self.endscene = Endscene()
+        self.__lang = 'English'
 
     def add_player(self, player):
         self.players.append(player)
         self.leaderboard.players = self.players
-    
+
+    def set_lang(self, lang):
+        self.__lang = lang
+
     def draw(self):
         self.win.blit(self.BG, (0, 0))
         self.leaderboard.draw(self.win)
@@ -66,13 +72,13 @@ class Game:
 
         # Check click on skip button
         if self.skip_button.click(*mouse) and not self.drawing:
-            skips = self.connection.send({1:[]})
+            skips = self.connection.send({1: []})
 
         clicked_board = self.board.click(*mouse)
 
         if clicked_board:
             self.board.update(*clicked_board, self.draw_color)
-            self.connection.send({8:[*clicked_board, self.COLORS[tuple(self.draw_color)]]})
+            self.connection.send({8: [*clicked_board, self.COLORS[tuple(self.draw_color)]]})
 
     def run(self):
         run = True
@@ -81,27 +87,30 @@ class Game:
             clock.tick(60)
             try:
                 # get board
-                response = self.connection.send({3:[]})
+                response = self.connection.send({3: []})
                 if response:
                     self.board.compressed_board = response
                     self.board.translate_board()
                 # get time
-                response = self.connection.send({9:[]})
+                response = self.connection.send({9: []})
                 self.top_bar.time = response
 
                 # get chat
-                response = self.connection.send({2:[]})
+                response = self.connection.send({2: []})
                 self.chat.update_chat(response)
 
                 # get round info
-                self.top_bar.word = self.connection.send({6:[]})
-                self.top_bar.round = self.connection.send({5:[]})
-                self.drawing = self.connection.send({11:[]})
+                self.top_bar.word = self.connection.send({6: []})
+                if self.__lang == 'Thai':
+                    self.top_bar.word = TRANSLATE(self.top_bar.word)
+
+                self.top_bar.round = self.connection.send({5: []})
+                self.drawing = self.connection.send({11: []})
                 self.top_bar.drawing = self.drawing
                 self.top_bar.max_round = len(self.players)
-                
-                # get scoreboard updates 
-                response = self.connection.send({4:[]})
+
+                # get scoreboard updates
+                response = self.connection.send({4: []})
                 try:
                     if self.top_bar.round <= self.top_bar.max_round:
                         self.endscene.scoreboard = self.players
@@ -109,17 +118,17 @@ class Game:
                             for i in range(len(self.players)):
                                 if self.players[i].name == player:
                                     self.players[i].update_score(response[player])
-                                
+
                 except:
                     run = False
                     self.ending = True
                     break
 
             except Exception as e:
-                print("EXCEPTION :",e)
+                print("EXCEPTION :", e)
                 run = False
                 break
-            
+
             self.draw()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -133,7 +142,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if not self.drawing:
                         if event.key == pygame.K_RETURN:
-                            self.connection.send({0:[self.chat.typing]})
+                            self.connection.send({0: [self.chat.typing]})
                             self.chat.typing = ""
 
                         else:
@@ -142,11 +151,10 @@ class Game:
                             # converts to uppercase the key name
                             key_name = key_name.lower()
                             self.chat.type(key_name)
-        
+
         while self.ending == True:
             self.endscene.draw()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     ending = False
                     pygame.quit()
-

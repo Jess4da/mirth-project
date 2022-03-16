@@ -2,6 +2,7 @@
 Top bar displaying information about round
 """
 import pygame
+import re
 
 
 class TopBar(object):
@@ -28,8 +29,6 @@ class TopBar(object):
         txt = self.round_font.render(f"Round {self.round} of {self.max_round}", 1, (255, 255, 255))
         win.blit(txt, (self.x + 10, self.y + self.height/2 - txt.get_height()/2))
 
-        self.word = 'หิว'
-
         # draw underscores
         if self.drawing:
             wrd = self.word
@@ -37,12 +36,19 @@ class TopBar(object):
             wrd = self.underscore_text(self.word)
 
         txt = self.word_font.render(wrd, 1, (255, 255, 255))
-        if self.drawing:
+        if self.drawing or re.match(r'[a-zA-Z]', self.word):
             win.blit(txt, (self.x + self.width/2 - txt.get_width()/2, self.y + self.height/2 - txt.get_height()/2 + 10))
         else:
-            for i, n in enumerate(wrd.split('_')):
+            for i, n in enumerate(wrd):
                 temp_txt = self.word_font.render(n, 1, (255, 255, 255))
-                win.blit(temp_txt, (self.x + self.width/2 - txt.get_width()/2 + (i*50), self.y + self.height/2 - txt.get_height()/2 + 10))
+                vowel = self.word_font.render("_", 1, (255, 255, 255))
+                if n in self.top_vowel:
+                    win.blit(vowel, (self.x + self.width/2 - txt.get_width()/2 + (i-1)*3, self.y + self.height/2 - txt.get_height()/2 + 5))
+                    continue
+                if n in self.bottom_vowel:
+                    win.blit(vowel, (self.x + self.width/2 - txt.get_width()/2 + (i-1)*3, self.y + self.height/2 - txt.get_height()/2 + 20))
+                    continue
+                win.blit(temp_txt, (self.x + self.width/2 - txt.get_width()/2 + (i*3), self.y + self.height/2 - txt.get_height()/2 + 10))
 
         pygame.draw.circle(win, (255, 255, 255), (self.x + self.width - 50, self.y + round(self.height/2)), 40, 0)
         timer = self.round_font.render(str(self.time), 1, (0, 0, 0))
