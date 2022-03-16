@@ -17,11 +17,13 @@ def TRANSLATE(wrd: str):
         data = {}
         with open('lang/words.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
-        return data.get(wrd, '')
+        return data.get(wrd, None)
     else:
         data = {}
         with open('lang/words.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
+        if wrd not in list(data.values()):
+            return None
         return list(data.keys())[list(data.values()).index(wrd)]
 
 

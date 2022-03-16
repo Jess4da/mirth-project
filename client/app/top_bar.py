@@ -43,12 +43,12 @@ class TopBar(object):
                 temp_txt = self.word_font.render(n, 1, (255, 255, 255))
                 vowel = self.word_font.render("_", 1, (255, 255, 255))
                 if n in self.top_vowel:
-                    win.blit(vowel, (self.x + self.width/2 - txt.get_width()/2 + (i-1)*3, self.y + self.height/2 - txt.get_height()/2 + 5))
+                    win.blit(vowel, (self.x + self.width/2 - txt.get_width()/2 + (i-1)*5, self.y + self.height/2 - txt.get_height()/2 + 5))
                     continue
                 if n in self.bottom_vowel:
-                    win.blit(vowel, (self.x + self.width/2 - txt.get_width()/2 + (i-1)*3, self.y + self.height/2 - txt.get_height()/2 + 20))
+                    win.blit(vowel, (self.x + self.width/2 - txt.get_width()/2 + (i-1)*5, self.y + self.height/2 - txt.get_height()/2 + 20))
                     continue
-                win.blit(temp_txt, (self.x + self.width/2 - txt.get_width()/2 + (i*3), self.y + self.height/2 - txt.get_height()/2 + 10))
+                win.blit(temp_txt, (self.x + self.width/2 - txt.get_width()/2 + (i*5), self.y + self.height/2 - txt.get_height()/2 + 10))
 
         pygame.draw.circle(win, (255, 255, 255), (self.x + self.width - 50, self.y + round(self.height/2)), 40, 0)
         timer = self.round_font.render(str(self.time), 1, (0, 0, 0))

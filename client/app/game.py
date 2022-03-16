@@ -9,6 +9,8 @@ from .chat import Chat
 from .network import Network
 from .endscene import Endscene
 from .lang import TRANSLATE
+import requests
+import random
 
 
 class Game:
@@ -100,9 +102,11 @@ class Game:
                 self.chat.update_chat(response)
 
                 # get round info
-                self.top_bar.word = self.connection.send({6: []})
+                self.__server_word = self.connection.send({6: []})
                 if self.__lang == 'Thai':
-                    self.top_bar.word = TRANSLATE(self.top_bar.word)
+                    self.top_bar.word = TRANSLATE(self.__server_word)
+                else:
+                    self.top_bar.word = self.__server_word
 
                 self.top_bar.round = self.connection.send({5: []})
                 self.drawing = self.connection.send({11: []})
@@ -142,6 +146,18 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if not self.drawing:
                         if event.key == pygame.K_RETURN:
+                            __typing = self.chat.typing
+                            if self.__lang == 'Thai':
+                                __typing = TRANSLATE(__typing)
+                                if __typing == None:
+                                    word_site = "https://www.mit.edu/~ecprice/wordlist.10000"
+                                    response = requests.get(word_site)
+                                    txt = response.content.splitlines()
+                                    while True:
+                                        __txt = txt[random.randint(0, 10000)]
+                                        if __txt != self.__server_word:
+                                            break
+                                    __typing = __txt
                             self.connection.send({0: [self.chat.typing]})
                             self.chat.typing = ""
 
