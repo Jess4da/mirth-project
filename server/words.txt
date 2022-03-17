@@ -1,4 +1,4 @@
-สวัสดี
-เทส
-หมา
-แมว
+cat
+dog
+ship
+ice-cream
