@@ -9,6 +9,7 @@ from app.config import config
 from app.lang import sys_lang
 from moviepy.editor import VideoFileClip
 import PIL
+import re
 
 
 class MainMenu:
@@ -99,25 +100,16 @@ class MainMenu:
                             if len(self.name) > 1:
                                 self.n = Network(self.name)
                                 self.waiting = True
+                        elif event.key == pygame.K_BACKSPACE:
+                            self.name = self.name[:-1]
                         else:
                             # gets the key name
-                            key_name = pygame.key.name(event.key)
-
-                            # converts to uppercase the key name
-                            key_name = key_name.lower()
-                            self.type(key_name)
+                            self.type(event.unicode)
 
     def type(self, char):
-        if char == "backspace":
-            if len(self.name) > 0:
-                self.name = self.name[:-1]
-        elif char == "space":
-            self.name += " "
-        elif len(char) == 1:
+        reg = r"[^\w\s]* "
+        if not re.match(reg, char):
             self.name += char
-
-        if len(self.name) >= 6:
-            self.name = self.name[:6]
 
 
 if __name__ == "__main__":

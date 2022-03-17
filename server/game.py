@@ -129,7 +129,7 @@ class Game(object):
         gives a word that has not yet been used
         :return: str
         """
-        with open("words.txt", "r") as f:
+        with open("words.txt", "r", encoding="utf-8") as f:
             words = []
 
             for line in f:
