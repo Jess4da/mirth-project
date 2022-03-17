@@ -107,9 +107,10 @@ class MainMenu:
                             self.type(event.unicode)
 
     def type(self, char):
-        reg = r"[^\w\s]* "
+        reg = r"[$&+,:;=?@#|'<>.^*()%!-\"]"
         if not re.match(reg, char):
-            self.name += char
+            if len(self.name) < 6:
+                self.name += char
 
 
 if __name__ == "__main__":
