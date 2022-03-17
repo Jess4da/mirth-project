@@ -3,6 +3,8 @@ Shows the main menu for the game, gets the user name before starting
 """
 import pygame
 from .player import Player
+from .config import config
+from .lang import sys_lang
 
 
 class Endscene:
@@ -20,7 +22,8 @@ class Endscene:
 
     def draw(self):
         self.win.blit(self.BG, (0, 0))
-        title = self.title_font.render("WINNER", 1, (255, 255, 255))
+        __winner = sys_lang.lang(config['LANGUAGE']['lang'])['15']
+        title = self.title_font.render(f"{__winner}", 1, (255, 255, 255))
         self.win.blit(title, (self.WIDTH/2 - title.get_width()/2, 50))
 
         scores = [(player.name, player.score) for player in self.scoreboard]

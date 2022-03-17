@@ -38,7 +38,6 @@ class Round(object):
             self.chat.update_chat(f"Player has voted to skip ({self.skips}/{len(self.game.players) -2})")
             if self.skips >= 2:
                 return True
-        
 
         return False
 
@@ -67,7 +66,7 @@ class Round(object):
         while self.time > 0:
             t.sleep(1)
             self.time -= 1
-            if  len(self.player_guessed) == len(self.player_scores) - 1:
+            if len(self.player_guessed) == len(self.player_scores) - 1:
                 break
         self.end_round()
 
@@ -85,9 +84,9 @@ class Round(object):
                 plus = self.time // 5
                 player.update_score(plus)
                 self.chat.update_chat(f"{player.name} has guessed the word")
-                return True  
+                return True
 
-            self.chat.update_chat(f"{player.name} guessed {wrd}")
+            self.chat.update_chat(f"{player.name} guessed wrong")
             return False
 
     def player_left(self, player):
@@ -97,7 +96,7 @@ class Round(object):
         :return: None
         """
         # might not be able to use player as key in dict
-        #'''
+        # '''
         if player in self.player_scores:
             del self.player_scores[player]
 
@@ -107,10 +106,10 @@ class Round(object):
         if player == self.player_drawing:
             self.chat.update_chat("Round has been skipped because the drawer left")
             self.end_round()
-        #'''
+        # '''
+
     def end_round(self):
         for player in self.game.players:
             if player in self.player_scores:
                 player.update_score(self.player_scores[player])
         self.game.round_ended()
-

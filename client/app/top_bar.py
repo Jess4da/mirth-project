@@ -3,6 +3,8 @@ Top bar displaying information about round
 """
 import pygame
 import re
+from .config import config
+from .lang import sys_lang
 
 
 class TopBar(object):
@@ -26,7 +28,9 @@ class TopBar(object):
         pygame.draw.rect(win, (255, 255, 255), (self.x, self.y, self.width, self.height), self.BORDER_THICKNESS)
 
         # draw round
-        txt = self.round_font.render(f"Round {self.round} of {self.max_round}", 1, (255, 255, 255))
+        __round = sys_lang.lang(config['LANGUAGE']['lang'])['6']
+        __of = sys_lang.lang(config['LANGUAGE']['lang'])['7']
+        txt = self.round_font.render(f"{__round} {self.round} {__of} {self.max_round}", 1, (255, 255, 255))
         win.blit(txt, (self.x + 10, self.y + self.height/2 - txt.get_height()/2))
 
         # draw underscores

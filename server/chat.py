@@ -11,6 +11,8 @@ class Chat(object):
 
     def update_chat(self, msg):
         self.content.append(msg)
+        if len(self.content) > 35:
+            del self.content[0]
 
     def get_chat(self):
         return self.content

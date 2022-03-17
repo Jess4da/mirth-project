@@ -1,0 +1,1 @@
+start pwsh -ArgumentList "-c D:\Coding\Python\Mirth\vPy\Scripts\python.exe main.py;PAUSE"

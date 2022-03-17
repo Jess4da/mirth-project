@@ -11,6 +11,9 @@ from .endscene import Endscene
 from .lang import TRANSLATE
 import requests
 import random
+import re
+from .config import config
+from .lang import sys_lang
 
 
 class Game:
@@ -37,7 +40,8 @@ class Game:
         self.top_bar = TopBar(10, 10, 1280, 100)
         self.top_bar.change_round(1)
         self.players = []
-        self.skip_button = TextButton(85, 830, 125, 60, (255, 255, 0), "Skip")
+        __skip = sys_lang.lang(config['LANGUAGE']['lang'])['9']
+        self.skip_button = TextButton(85, 830, 125, 60, (255, 255, 0), f"{__skip}")
         self.bottom_bar = BottomBar(305, 880, self)
         self.chat = Chat(1050, 125)
         self.draw_color = (0, 0, 0)
@@ -99,12 +103,25 @@ class Game:
 
                 # get chat
                 response = self.connection.send({2: []})
+                for i, res in enumerate(response):
+                    if "guessed wrong" in res:
+                        s_res = res.split(' ')
+                        __wrong = sys_lang.lang(config['LANGUAGE']['lang'])['10']
+                        response[i] = s_res[0] + f' {__wrong}'
+                    elif "has guessed the word" in res:
+                        s_res = res.split(' ')
+                        __corr = sys_lang.lang(config['LANGUAGE']['lang'])['11']
+                        response[i] = s_res[0] + f' {__corr}'
+                    elif "Player has voted to skip" in res:
+                        s_res = res.split('/')
+                        __skip = sys_lang.lang(config['LANGUAGE']['lang'])['14']
+                        response[i] = f'{__skip} (' + s_res[0][-1] + '/' + s_res[1][0] + ')'
                 self.chat.update_chat(response)
 
                 # get round info
                 self.__server_word = self.connection.send({6: []})
                 if self.__lang == 'Thai':
-                    self.top_bar.word = TRANSLATE(self.__server_word)
+                    self.top_bar.word = TRANSLATE(self.__server_word, to='th')
                 else:
                     self.top_bar.word = self.__server_word
 
@@ -146,27 +163,20 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if not self.drawing:
                         if event.key == pygame.K_RETURN:
-                            __typing = self.chat.typing
-                            if self.__lang == 'Thai':
-                                __typing = TRANSLATE(__typing)
-                                if __typing == None:
-                                    word_site = "https://www.mit.edu/~ecprice/wordlist.10000"
-                                    response = requests.get(word_site)
-                                    txt = response.content.splitlines()
-                                    while True:
-                                        __txt = txt[random.randint(0, 10000)]
-                                        if __txt != self.__server_word:
-                                            break
-                                    __typing = __txt
-                            self.connection.send({0: [self.chat.typing]})
-                            self.chat.typing = ""
-
+                            if self.chat.typing:
+                                __typing = self.chat.typing
+                                if self.__lang == 'Thai':
+                                    __typing = TRANSLATE(__typing, to='en')
+                                    self.chat.typing = __typing
+                                self.connection.send({0: [self.chat.typing]})
+                                self.chat.typing = ""
+                        elif event.key == pygame.K_BACKSPACE:
+                            txt = self.chat.get_typing()
+                            txt = txt[:-1]
+                            self.chat.set_typing(txt)
                         else:
                             # gets the key name
-                            key_name = pygame.key.name(event.key)
-                            # converts to uppercase the key name
-                            key_name = key_name.lower()
-                            self.chat.type(key_name)
+                            self.type(event.unicode)
 
         while self.ending == True:
             self.endscene.draw()
@@ -174,3 +184,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     ending = False
                     pygame.quit()
+
+    def type(self, char):
+        reg = r"[$&+,:;=?@#|'<>.^*()%!-\" ]"
+        txt = self.chat.get_typing()
+        if not re.match(reg, char) and char:
+            txt += char
+            self.chat.set_typing(txt)

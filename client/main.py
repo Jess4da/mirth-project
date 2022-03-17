@@ -43,6 +43,10 @@ class MainMenu:
 
         pos = pygame.mouse.get_pos()
 
+        config['LANGUAGE'] = {
+            'lang': self.language
+        }
+
         if languageButton.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1 and self.__click == False:
                 self.language = "Thai" if self.language == "English" else "English"
@@ -107,7 +111,7 @@ class MainMenu:
                             self.type(event.unicode)
 
     def type(self, char):
-        reg = r"[$&+,:;=?@#|'<>.^*()%!-\"]"
+        reg = r"[$&+,:;=?@#|'<>.^*()%!-\" ]"
         if not re.match(reg, char):
             if len(self.name) < 6:
                 self.name += char

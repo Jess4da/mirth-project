@@ -45,3 +45,7 @@ class Chat:
 
         if len(self.typing) >= 25:
             self.typing = self.typing[:25]
+    def set_typing(self, txt):
+        self.typing = txt
+    def get_typing(self):
+        return self.typing
