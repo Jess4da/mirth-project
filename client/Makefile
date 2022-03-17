@@ -1,4 +1,4 @@
-:SILENT
+.SILENT:
 
-all:
+install:	
 	@pyinstaller -F main.spec
