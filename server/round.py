@@ -3,8 +3,9 @@ Represents a round of the game, storing things like
 word, time, skips, drawing player and more.
 """
 import time as t
-from _thread import *
+# from _thread import *
 from chat import Chat
+from threading import Thread, Event
 
 
 class Round(object):
@@ -24,7 +25,10 @@ class Round(object):
         self.game = game
         self.player_scores = {player: 0 for player in self.game.players}
         self.chat = Chat(self)
-        start_new_thread(self.time_thread, ())
+        # start_new_thread(self.time_thread, ())
+        self.__event = Event()
+        self.__thread = Thread(target=self.time_thread, args=())
+        self.__thread.start()
 
     def skip(self, player):
         """
@@ -37,6 +41,8 @@ class Round(object):
             self.skips += 1
             self.chat.update_chat(f"Player has voted to skip ({self.skips}/{len(self.game.players) -2})")
             if self.skips >= 2:
+                self.__event.set()
+                self.__thread.join()
                 return True
 
         return False
@@ -63,10 +69,12 @@ class Round(object):
         Runs in thread to keep track of time
         :return: None
         """
-        while self.time > 0:
-            t.sleep(1)
+        while not self.__event.wait(1):
+            # t.sleep(1)
             self.time -= 1
             if len(self.player_guessed) == len(self.player_scores) - 1:
+                break
+            if self.time < 1:
                 break
         self.end_round()
 
